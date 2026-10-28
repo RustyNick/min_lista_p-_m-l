@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Min lista till allt som får hjärtat att slå</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cutive+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffe4e8;--head:#f9b0b0;--ink:#1f1a1a;--text:#1f1a1a;--yellow:#ffe896;--yitem:#fff2c2;--green:#c5e8c0;--peach:#ffd9bf;--card:#ffe49a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#3a2a2e;--text:#f6e9ea;--ink:#f6e9ea}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Cutive Mono','Courier New',monospace;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+svg{width:1.2em;height:1.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+header{background:var(--head);color:#1f1a1a;text-align:center;font-family:'Special Elite',monospace;font-size:1.25rem;font-weight:700;padding:14px 44px;line-height:1.3;position:relative}
+header:before,header:after{content:"✨";position:absolute;top:50%;transform:translateY(-50%);font-size:1.8rem}
+header:before{left:6px}header:after{right:6px}
+main{max-width:560px;margin:0 auto;padding:18px 16px 60px}
+.yr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.yr h1{font-family:'Special Elite',monospace;font-size:2.2rem;font-weight:400;margin:0}
+.yr button{display:flex;align-items:center;gap:6px;font-size:1rem}
+.yr button svg{width:34px;height:34px}
+.yr .sp{width:70px}
+.bar{display:flex;justify-content:space-between;gap:10px;margin-bottom:18px}
+.btn{font-family:'Special Elite',monospace;font-weight:700;padding:12px 16px;border-radius:16px;display:inline-flex;align-items:center;gap:8px;font-size:.95rem;color:#1f1a1a}
+.b-out{border:4px solid #2e2a2a;background:transparent;color:var(--text)}
+.b-yel{background:var(--yellow)}
+.sech{display:flex;justify-content:space-between;align-items:center;width:100%;font-family:'Special Elite',monospace;font-size:1.2rem;padding:14px 10px}
+.sech svg{transition:transform .2s}
+.sec.closed .sech svg{transform:rotate(180deg)}
+.sec.closed .items{display:none}
+.sec{border-radius:14px;transition:background .15s}
+.sec.over{background:rgba(255,255,255,.55);outline:3px dashed #e08a8a}
+.items{display:flex;flex-direction:column;gap:10px;padding:4px 0 14px;min-height:20px}
+hr{border:0;border-top:2px solid var(--ink);margin:8px 0 6px;opacity:.8}
+.item{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:18px;color:#1f1a1a;user-select:none;-webkit-user-select:none;touch-action:pan-y;cursor:grab;-webkit-touch-callout:none}
+.item.y{background:var(--yitem)}.item.f{background:var(--peach)}.item.d{background:var(--green);cursor:default}
+.item .t{flex:1;overflow-wrap:anywhere}
+.item.d .t{text-decoration:line-through}
+.item input{width:18px;height:18px;accent-color:#222;margin:0;cursor:pointer}
+.item button{padding:2px}
+.item.dragging{opacity:.3}
+.ghost{position:fixed;z-index:50;pointer-events:none;box-shadow:0 10px 24px rgba(0,0,0,.25);transform:rotate(2deg)}
+.empty{opacity:.6;text-align:center;padding:12px;font-size:.95rem}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.3);display:none;align-items:center;justify-content:center;padding:24px;z-index:100}
+#modal.on{display:flex}
+.card{background:var(--card);color:#1f1a1a;border-radius:22px;padding:28px 22px;width:100%;max-width:380px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.card h2{font-family:'Special Elite',monospace;font-size:2.4rem;margin:6px 0 18px;letter-spacing:.1em}
+.card h3{font-family:'Special Elite',monospace;margin:0 0 14px}
+.card p{margin:0 0 22px;line-height:1.5}
+.card input[type=text]{width:100%;padding:12px;border-radius:12px;border:2px solid #2e2a2a;font:inherit;background:#fff;color:#1f1a1a;margin-bottom:12px}
+.card .btn{width:100%;justify-content:center;background:var(--green);margin-top:8px}
+.card .btn.alt{background:#fff}
+.seg{display:flex;gap:8px;margin-bottom:6px}
+.seg label{flex:1;padding:10px 6px;border-radius:12px;background:#fff;border:2px solid transparent;cursor:pointer;font-size:.9rem}
+.seg input{display:none}
+.seg label:has(input:checked){border-color:#2e2a2a;background:var(--peach)}
+.cf{position:fixed;top:-30px;width:18px;height:18px;z-index:200;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(540deg)}}
+#print{display:none}
+@media print{
+ @page{size:A4 portrait;margin:14mm}
+ body>*:not(#print){display:none!important}
+ body{background:#fff}
+ #print{display:block;color:#000;text-align:center;font-family:'Special Elite','Courier New',monospace}
+ #print h1{font-size:54pt;font-weight:400;margin:10mm 0 2mm}
+ #print .sub{font-size:11pt;font-weight:700}
+ #print h2{font-size:26pt;font-weight:400;margin:10mm 0 6mm;letter-spacing:.04em}
+ .grid{display:grid;grid-template-columns:repeat(5,1fr);border-top:2px solid #000;border-left:2px solid #000}
+ .grid div{aspect-ratio:1;border-right:2px solid #000;border-bottom:2px solid #000;display:flex;align-items:center;justify-content:center;padding:4px;font-size:9pt;font-family:'Cutive Mono',monospace;overflow-wrap:anywhere}
+}
+</style>
+</head>
+<body>
+<header>Min lista till allt som får hjärtat att slå</header>
+<main id="app"></main>
+<div id="modal"></div>
+<div id="print"></div>
+<script>
+const CUR=new Date().getFullYear();
+const ICO={
+ back:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 12H8M12 8l-4 4 4 4"/></svg>',
+ fwd:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>',
+ print:'<svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-8h16v8h-2M6 14h12v7H6z"/></svg>',
+ plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ edit:'<svg viewBox="0 0 24 24"><path d="M11 4H4v16h16v-7M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4z"/></svg>',
+ del:'<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v7M14 10v7"/></svg>',
+ chev:'<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>'};
+let goals=[],vy=CUR,closed={year:false,future:false};
+try{goals=JSON.parse(localStorage.getItem('malista')||'null')}catch(e){}
+if(!Array.isArray(goals)){
+ const g=(text,status,done)=>({id:Math.random().toString(36).slice(2),text,status,year:status==='year'?CUR:null,done:!!done});
+ goals=[g('Se en vulkan','year'),g('Köpa sommarstuga','year'),g('Sova ute i naturen på vinter','year'),g('Lia 1','year',1),g('Uppgift','year',1),g('Resa till Höga kusten','future'),g('Uppgift','future'),g('Uppgift','future')];
+}
+const save=()=>{try{localStorage.setItem('malista',JSON.stringify(goals))}catch(e){}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function item(g){
+ if(vy<CUR)return `<div class="item d"><input type="checkbox" checked disabled><span class="t">${esc(g.text)}</span></div>`;
+ if(g.done)return `<div class="item d" data-id="${g.id}"><input type="checkbox" checked data-a="undo"><span class="t">${esc(g.text)}</span><span style="font-size:1.6rem">🎉</span></div>`;
+ const cb=g.status==='year'?`<input type="checkbox" data-a="done">`:'';
+ return `<div class="item ${g.status==='year'?'y':'f'}" data-id="${g.id}">${cb}<span class="t">${esc(g.text)}</span><button data-a="edit" aria-label="Redigera">${ICO.edit}</button><button data-a="del" aria-label="Ta bort">${ICO.del}</button></div>`;
+}
+function sec(k,title,list){
+ return `<section class="sec ${closed[k]?'closed':''}" data-k="${k}"><button class="sech" data-a="tog">${title}${ICO.chev}</button><div class="items">${list.map(item).join('')||'<div class="empty">Dra ett mål hit</div>'}</div></section>`;
+}
+function render(){
+ const app=document.getElementById('app');
+ let h=`<div class="yr">${vy>0?`<button data-a="prev">${ICO.back}<span style="font-size:.95rem">${vy-1}</span></button>`:''}<h1>${vy}</h1>${vy<CUR?`<button data-a="next"><span style="font-size:.95rem">${vy+1}</span>${ICO.fwd}</button>`:'<span class="sp"></span>'}</div>`;
+ h+=`<div class="bar"><button class="btn b-out" data-a="print">Skriv ut ${ICO.print}</button>${vy<CUR?`<button class="btn b-yel" data-a="cur">Gå till ${CUR} ${ICO.fwd}</button>`:`<button class="btn b-yel" data-a="new">Skapa ett nytt mål ${ICO.plus}</button>`}</div>`;
+ if(vy<CUR){
+  const l=goals.filter(g=>g.status==='year'&&g.year===vy&&g.done);
+  h+=l.map(item).join('')||'<div class="empty">Inga avklarade mål det här året</div>';
+  h=h.replace(/(<div class="item d"[^]*)/,'<div class="items">$1</div>');
+ }else{
+  const y=goals.filter(g=>g.status==='year'&&g.year===CUR).sort((a,b)=>a.done-b.done);
+  h+=sec('year','Detta vill jag göra i år',y)+'<hr>'+sec('future','Framtiden',goals.filter(g=>g.status==='future'));
+ }
+ app.innerHTML=h;
+}
+function confetti(){
+ const c=['#ffb3b3','#b8f5a8','#bfe9ff','#fff3b0','#ffd4b8','#a8ff9c'];
+ for(let i=0;i<45;i++){const d=document.createElement('div');d.className='cf';d.style.left=Math.random()*100+'vw';d.style.background=c[i%c.length];d.style.animationDuration=(2+Math.random()*2.5)+'s';d.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),5500)}
+}
+const modal=document.getElementById('modal');
+const closeM=()=>{modal.classList.remove('on');modal.innerHTML=''};
+function wow(){
+ confetti();
+ modal.innerHTML=`<div class="card"><h2>⭐ WOW ⭐</h2><p>Ett minne för livet!<br>Ta ett djupt andetag och njut av känslan.</p><button class="btn" data-m="x">Vidare mot nästa äventyr!</button></div>`;
+ modal.classList.add('on');
+}
+function form(g){
+ const isNew=!g;
+ modal.innerHTML=`<div class="card"><h3>${isNew?'Skapa ett nytt mål':'Redigera mål'}</h3><input type="text" id="fi" maxlength="80" placeholder="Vad vill du uppleva?" value="${g?esc(g.text):''}">${isNew?`<div class="seg"><label><input type="radio" name="s" value="year" checked>Detta år</label><label><input type="radio" name="s" value="future">Framtiden</label></div>`:''}<button class="btn" data-m="ok">Spara</button><button class="btn alt" data-m="x">Avbryt</button></div>`;
+ modal.classList.add('on');modal._g=g||null;
+ const i=document.getElementById('fi');i.focus();
+ i.onkeydown=e=>{if(e.key==='Enter')modal.querySelector('[data-m=ok]').click()};
+}
+modal.addEventListener('click',e=>{
+ const m=e.target.dataset.m;
+ if(e.target===modal||m==='x')return closeM();
+ if(m==='ok'){
+  const t=document.getElementById('fi').value.trim();if(!t)return;
+  if(modal._g)modal._g.text=t;
+  else{const s=modal.querySelector('input[name=s]:checked').value;goals.push({id:Math.random().toString(36).slice(2),text:t,status:s,year:s==='year'?CUR:null,done:false})}
+  save();closeM();render();
+ }
+});
+document.getElementById('app').addEventListener('click',e=>{
+ const b=e.target.closest('[data-a]');if(!b)return;
+ const a=b.dataset.a,it=b.closest('.item'),g=it&&goals.find(x=>x.id===it.dataset.id);
+ if(a==='prev'){vy--;render()}
+ else if(a==='next'){vy++;render()}
+ else if(a==='cur'){vy=CUR;render()}
+ else if(a==='new')form();
+ else if(a==='print')doPrint();
+ else if(a==='tog'){const k=b.closest('.sec').dataset.k;closed[k]=!closed[k];render()}
+ else if(a==='edit')form(g);
+ else if(a==='del'){goals=goals.filter(x=>x!==g);save();render()}
+ else if(a==='done'){g.done=true;save();render();wow()}
+ else if(a==='undo'){g.done=false;save();render()}
+});
+function doPrint(){
+ const y=goals.filter(g=>g.status==='year'&&g.year===vy).slice(0,25);
+ const cells=[];
+ for(let i=0;i<25;i++)cells.push(`<div>${y[i]?esc(y[i].text.replace(/\S+/g,w=>w[0].toUpperCase()+w.slice(1))):'Tom Ruta'}</div>`);
+ document.getElementById('print').innerHTML=`<h1>${vy}</h1><div class="sub">Min lista till allt som får hjärtat att slå</div><h2>BINGOÄVENTYR</h2><div class="grid">${cells.join('')}</div>`;
+ setTimeout(()=>window.print(),50);
+}
+
+/* Dra och släpp mellan "Detta år" och "Framtiden" */
+let st=null,dr=null,timer=null;
+const app=document.getElementById('app');
+const blockTouch=e=>{if(dr)e.preventDefault()};
+document.addEventListener('touchmove',blockTouch,{passive:false});
+app.addEventListener('pointerdown',e=>{
+ if(vy<CUR||e.button>0)return;
+ const it=e.target.closest('.item');
+ if(!it||it.classList.contains('d')||e.target.closest('button,input'))return;
+ st={it,x:e.clientX,y:e.clientY,touch:e.pointerType==='touch',px:e.clientX,py:e.clientY};
+ if(st.touch)timer=setTimeout(()=>{if(st)begin()},280);
+});
+function begin(){
+ const r=st.it.getBoundingClientRect();
+ const gh=st.it.cloneNode(true);gh.classList.add('ghost');gh.style.width=r.width+'px';
+ gh._dx=st.px-r.left;gh._dy=st.py-r.top;
+ document.body.appendChild(gh);st.it.classList.add('dragging');
+ dr={gh,id:st.it.dataset.id,sec:null,over:null,after:false};
+ document.body.style.userSelect='none';
+ place(st.px,st.py);
+}
+function place(x,y){
+ dr.gh.style.left=(x-dr.gh._dx)+'px';dr.gh.style.top=(y-dr.gh._dy)+'px';
+ const el=document.elementFromPoint(x,y);
+ document.querySelectorAll('.sec.over').forEach(s=>s.classList.remove('over'));
+ dr.sec=el&&el.closest('.sec');dr.over=null;
+ if(dr.sec){dr.sec.classList.add('over');
+  const o=el.closest('.item');
+  if(o&&o.dataset.id&&o.dataset.id!==dr.id&&dr.sec.contains(o)){const r=o.getBoundingClientRect();dr.over=o.dataset.id;dr.after=y>r.top+r.height/2}}
+}
+window.addEventListener('pointermove',e=>{
+ if(!st)return;st.px=e.clientX;st.py=e.clientY;
+ if(!dr){
+  const d=Math.hypot(e.clientX-st.x,e.clientY-st.y);
+  if(st.touch){if(d>10){clearTimeout(timer);st=null}}
+  else if(d>5)begin();
+ }
+ if(dr)place(e.clientX,e.clientY);
+});
+function endDrag(drop){
+ clearTimeout(timer);
+ if(dr){
+  dr.gh.remove();document.body.style.userSelect='';
+  document.querySelectorAll('.sec.over').forEach(s=>s.classList.remove('over'));
+  if(drop&&dr.sec){
+   const g=goals.find(x=>x.id===dr.id);const k=dr.sec.dataset.k;
+   goals=goals.filter(x=>x!==g);
+   g.status=k;g.year=k==='year'?CUR:null;
+   if(k==='year')g.done=false;
+   let idx=goals.length;
+   if(dr.over){const i=goals.findIndex(x=>x.id===dr.over);idx=i+(dr.after?1:0)}
+   goals.splice(idx,0,g);save();
+  }
+  render();
+ }
+ dr=null;st=null;
+}
+window.addEventListener('pointerup',()=>endDrag(true));
+window.addEventListener('pointercancel',()=>{if(dr)endDrag(false);else{clearTimeout(timer);st=null}});
+window.addEventListener('contextmenu',e=>{if(dr||st)e.preventDefault()});
+render();
+</script>
+</body>
+</html>
